@@ -3,8 +3,10 @@ package networking;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
-public class Server
+public class Server extends Thread
 {
     private DatagramSocket socket;
 
@@ -12,13 +14,13 @@ public class Server
     {
         try {
             socket = new DatagramSocket(port);
-            run();
         }catch (IOException ioe) {
             System.out.println("IOException thrown: " + ioe);
         }
     }
 
-    private void run()
+    @Override
+    public void run()
     {
         while (!socket.isClosed())
         {
@@ -31,7 +33,8 @@ public class Server
                 System.out.println("Server threw IOException while waiting for packet: " + ioe);
             }
 
-            System.out.println(data);
+            float f = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+            System.out.println(f);
         }
     }
 }

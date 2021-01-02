@@ -61,5 +61,7 @@ public class Rocket
        data[13] = (byte)sim.accelerationY;
        data[17] = (byte)sim.altitude;
        data[21] = (byte)sim.temperature;
+
+       packet.setData(data);
     }
 }
