@@ -1,0 +1,9 @@
+package sim;
+
+public class MainSimulation
+{
+    public static void main()
+    {
+
+    }
+}
