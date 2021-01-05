@@ -1,12 +1,15 @@
 package networking;
 
 import sim.Simulation;
+
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.net.DatagramPacket;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 public class Rocket
 {
@@ -18,12 +21,12 @@ public class Rocket
     public Rocket(String hostName, int port)
     {
         try{
-            byte[] tempData = new byte[100];
+            byte[] tempData = new byte[Server.PACKET_SIZE];
 
             this.socket = new DatagramSocket();
             this.address = InetAddress.getByName(hostName);
             this.port = port;
-            this.packet = packet = new DatagramPacket(tempData, tempData.length , address , port);
+            this.packet = new DatagramPacket(tempData, Server.PACKET_SIZE , address , port);
             
         } catch (SocketException se) {
             System.out.println("SocketException thrown: " + se);
@@ -41,7 +44,7 @@ public class Rocket
         }
     }
 
-    public void preparePacket(Simulation sim)
+    public void preparePacket(float[] simData)
     {
         /*
             Structure: (Starting Byte | Data)
@@ -53,15 +56,27 @@ public class Rocket
             21 | temperature
          */
 
-       byte[] data = new byte[100];
+        // Prepare temporary array list for appending bytes
+        ArrayList<Byte> byteArrayList = new ArrayList<>();
 
-       data[0] = (byte)sim.velocityX;
-       data[5] = (byte)sim.velocityY;
-       data[9] = (byte)sim.accelerationX;
-       data[13] = (byte)sim.accelerationY;
-       data[17] = (byte)sim.altitude;
-       data[21] = (byte)sim.temperature;
+        // Add values to the array list
+        for (int i = 0; i < simData.length; i++)
+        {
+            byte[] temp = ByteBuffer.allocate(4).putFloat(simData[i]).array();
 
-       packet.setData(data);
+            for (int j = 0; j < temp.length; j++)
+            {
+                byteArrayList.add(temp[j]);
+            }
+        }
+
+        // Get a byte[] from ArrayList<Byte>
+        byte[] finalData = new byte[Server.PACKET_SIZE];
+        for (int i = 0; i < byteArrayList.size(); i++)
+        {
+            finalData[i] = byteArrayList.get(i).byteValue();
+        }
+
+        packet.setData(finalData);
     }
 }
