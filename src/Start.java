@@ -25,7 +25,7 @@ public class Start
 
         Simulation sim = new Simulation();
 
-        rocket.preparePacket(sim);
+        rocket.preparePacket(sim.getTelemetry());
         rocket.broadcast();
     }
 }

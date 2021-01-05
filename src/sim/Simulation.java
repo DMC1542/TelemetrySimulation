@@ -2,7 +2,7 @@ package sim;
 
 public class Simulation
 {
-    public final int NUM_MEASUREMENTS = 6;
+    public static final int NUM_MEASUREMENTS = 6;
     private float accelerationX, accelerationY, velocityX, velocityY, altitude, temperature;
 
     public Simulation()

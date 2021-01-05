@@ -1,5 +1,7 @@
 package networking;
 
+import sim.Simulation;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -7,7 +9,10 @@ import java.net.DatagramSocket;
 public class Server extends Thread
 {
     private DatagramSocket socket;
-    public static final int PACKET_SIZE = 100;
+    private float[] telemetry = new float[Simulation.NUM_MEASUREMENTS];
+    private boolean displayTelemetry = true;
+
+    public static final int PACKET_SIZE = Simulation.NUM_MEASUREMENTS * 4;
 
     public Server(int port)
     {
@@ -35,13 +40,32 @@ public class Server extends Thread
             data = packet.getData();
 
             // Packet received. Let's display the information.
-            int temp = 0;
-            temp += (((int) data[0]) & 0xFF) << 24;
-            temp += (((int) data[1]) & 0xFF) << 16;
-            temp += (((int) data[2]) & 0xFF) << 8;
-            temp += (((int) data[3]) & 0xFF);
+            int telemetryIndex = 0;
+            for (int i = 0; i < PACKET_SIZE; i += 4)
+            {
+                int temp = 0;
+                temp += (((int) data[i]) & 0xFF) << 24;
+                temp += (((int) data[i + 1]) & 0xFF) << 16;
+                temp += (((int) data[i + 2]) & 0xFF) << 8;
+                temp += (((int) data[i + 3]) & 0xFF);
 
-            System.out.println(Float.intBitsToFloat(temp));
+                telemetry[telemetryIndex] = Float.intBitsToFloat(temp);
+                telemetryIndex++;
+            }
+
+            // Display telemetry if appropriate
+            if (displayTelemetry)
+                printTelemetry();
         }
+    }
+
+    public void printTelemetry()
+    {
+        System.out.println("Horizontal Velocity: " + telemetry[0]);
+        System.out.println("Vertical Velocity: " + telemetry[1]);
+        System.out.println("Horizontal Acceleration: " + telemetry[2]);
+        System.out.println("Vertical Acceleration: " + telemetry[3]);
+        System.out.println("Altitude: " + telemetry[4]);
+        System.out.println("Temperature: " + telemetry[5]);
     }
 }
