@@ -1,7 +1,5 @@
 package networking;
 
-import sim.Simulation;
-
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;

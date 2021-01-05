@@ -18,14 +18,24 @@ public class Start
 {
     public static void main(String args[])
     {
+        Simulation sim = new Simulation();
+        Rocket rocket = new Rocket(args[0], Integer.parseInt(args[1]));
+
         Server server = new Server(8080);
         server.start();
 
-        Rocket rocket = new Rocket("localhost", 8080);
-
-        Simulation sim = new Simulation();
-
+        // For debugging, can be removed later.
         rocket.preparePacket(sim.getTelemetry());
         rocket.broadcast();
+
+        /* Main loop
+        while (true)
+        {
+            // sim.update(); or sim.nextStep();
+
+            rocket.preparePacket(sim.getTelemetry());
+            rocket.broadcast();
+        }
+         */
     }
 }

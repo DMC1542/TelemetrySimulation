@@ -66,6 +66,6 @@ public class Server extends Thread
         System.out.println("Horizontal Acceleration: " + telemetry[2]);
         System.out.println("Vertical Acceleration: " + telemetry[3]);
         System.out.println("Altitude: " + telemetry[4]);
-        System.out.println("Temperature: " + telemetry[5]);
+        System.out.println("Temperature: " + telemetry[5] + " F");
     }
 }
