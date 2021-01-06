@@ -50,9 +50,9 @@ public class Rocket
             this.packet = new DatagramPacket(tempData, Server.PACKET_SIZE , address , port);
             
         } catch (SocketException se) {
-            System.out.println("SocketException thrown: " + se);
+            System.out.println("SocketException thrown by the rocket: " + se);
         } catch (UnknownHostException uhe) {
-            System.out.println("UnknownHostException thrown: " + uhe);
+            System.out.println("UnknownHostException thrown by the rocket: " + uhe);
         }
     }
 
