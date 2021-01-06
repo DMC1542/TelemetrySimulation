@@ -39,7 +39,7 @@ public class Server extends Thread
         try {
             socket = new DatagramSocket(port);
         }catch (IOException ioe) {
-            System.out.println("IOException thrown: " + ioe);
+            System.out.println("Server-side IOException thrown during socket initialization: " + ioe);
         }
     }
 
