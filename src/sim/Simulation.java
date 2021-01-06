@@ -1,5 +1,7 @@
 package sim;
 
+import java.util.Scanner;
+
 /**
  * The simulation which will generate telemetry for the rocket.
  *
@@ -20,6 +22,10 @@ public class Simulation
     private float accelerationX, accelerationY, velocityX, velocityY, altitude, temperature;
     /** Records if open rocket model flag is toggled or not */
     private boolean ormIsEnabled = false;
+    /** The file name for the ORM export if applicable. Otherwise, empty string. */
+    private String fileName = "";
+    /** The scanner to read in the Open rocket model export */
+    private Scanner in;
 
     /**
      * Generates an instance of the Simulation class.
@@ -34,6 +40,22 @@ public class Simulation
         this.velocityY = 20;
         this.altitude = 1000;
         this.temperature = 60; // in Fahrenheit
+    }
+
+    public void update()
+    {
+        // Follow the ORM if enabled
+        if (ormIsEnabled)
+        {
+            /*
+                Please note that only 5 of the 6 currently implemented measurements are
+                in the ORM model. Temperature (in my quick glance of the export list) is not
+                a variable that is exported by OpenRocket.
+                Please see the open rocket export file for more info on variable ordering.
+             */
+
+
+        }
     }
 
     /**
@@ -56,8 +78,11 @@ public class Simulation
         return data;
     }
 
-    public void setOrmFlag(boolean val)
+    public void enableOrmMode(boolean val, String fileName)
     {
+        this.ormIsEnabled = val;
+        this.fileName = fileName;
 
+        in = new Scanner(fileName);
     }
 }

@@ -37,12 +37,16 @@ public class Start
         Rocket rocket = new Rocket(args[0], Integer.parseInt(args[1]));
         Simulation sim = new Simulation();
 
+        // If flags, toggle their status
         if (args.length > 2)
         {
             for (int i = 2; i < args.length; i++)
             {
                 if (args[i].equals("-orm"))
-                    sim.setOrmFlag(true);
+                {
+                    sim.enableOrmMode(true, args[i + 1]);
+                    i++;
+                }
             }
         }
 
