@@ -27,14 +27,24 @@ public class Start
     /**
      * The main method. Serves as the entry point.
      *
-     * Usage: java Start hostName port
+     * Usage: java Start hostName port -orm
      *
-     * @param args The user-provided arguments containing host name and port.
+     * @param args The user-provided arguments containing host name and port, optionally:
+     *             -orm : Open Rocket Model
      */
     public static void main(String args[])
     {
-        Simulation sim = new Simulation();
         Rocket rocket = new Rocket(args[0], Integer.parseInt(args[1]));
+        Simulation sim = new Simulation();
+
+        if (args.length > 2)
+        {
+            for (int i = 2; i < args.length; i++)
+            {
+                if (args[i].equals("-orm"))
+                    sim.setOrmFlag(true);
+            }
+        }
 
         Server server = new Server(Integer.parseInt(args[1]));
         server.start();

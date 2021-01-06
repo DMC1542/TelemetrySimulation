@@ -18,6 +18,8 @@ public class Simulation
     public static final int NUM_MEASUREMENTS = 6;
     /** Telemetry values. */
     private float accelerationX, accelerationY, velocityX, velocityY, altitude, temperature;
+    /** Records if open rocket model flag is toggled or not */
+    private boolean ormIsEnabled = false;
 
     /**
      * Generates an instance of the Simulation class.
@@ -52,5 +54,10 @@ public class Simulation
         data[5] = temperature;
 
         return data;
+    }
+
+    public void setOrmFlag(boolean val)
+    {
+
     }
 }
