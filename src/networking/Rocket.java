@@ -44,9 +44,9 @@ public class Rocket
         try{
             byte[] tempData = new byte[Server.PACKET_SIZE];
 
-            this.socket = new DatagramSocket();
-            this.address = InetAddress.getByName(hostName);
             this.port = port;
+            this.socket = new DatagramSocket(port);
+            this.address = InetAddress.getByName(hostName);
             this.packet = new DatagramPacket(tempData, Server.PACKET_SIZE , address , port);
             
         } catch (SocketException se) {
