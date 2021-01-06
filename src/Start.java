@@ -21,9 +21,6 @@ import sim.Simulation;
 
 public class Start
 {
-    /** Determines whether the simulation continues. */
-    private boolean isActive = true;
-
     /**
      * The main method. Serves as the entry point.
      *
@@ -34,6 +31,9 @@ public class Start
      */
     public static void main(String args[])
     {
+        Server server = new Server(Integer.parseInt(args[1]));
+        server.start();
+
         Rocket rocket = new Rocket(args[0], Integer.parseInt(args[1]));
         Simulation sim = new Simulation();
 
@@ -50,23 +50,30 @@ public class Start
             }
         }
 
-        Server server = new Server(Integer.parseInt(args[1]));
-        server.start();
+        // Main loop
+        float[] lastTelemetryReadout = sim.getTelemetry();
 
-        // For debugging, can be removed later.
-        rocket.preparePacket(sim.getTelemetry());
-        rocket.broadcast();
-
-        /* Main loop
-        while (isActive)
+        while (true)
         {
-            // sim.update(); or sim.nextStep();
+            // Update that simulation.
+            sim.update();
+            float[] currentTelemetry = sim.getTelemetry();
 
-            rocket.preparePacket(sim.getTelemetry());
-            rocket.broadcast();
+            /* Check to see if we reached the end of the simulation. The times should be
+            exactly the same. If they are, break out of the loop.*/
+            if (lastTelemetryReadout[6] == currentTelemetry[6])
+            {
+                server.close();
+                break;
+            }
+            else
+            {
+                rocket.preparePacket(currentTelemetry);
+                rocket.broadcast();
+
+                // Reset lastTelemetryReadout
+                lastTelemetryReadout = currentTelemetry;
+            }
         }
-
-        server.close();
-        */
     }
 }

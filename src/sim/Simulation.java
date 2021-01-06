@@ -1,6 +1,6 @@
 package sim;
 
-import java.util.Scanner;
+import java.io.*;
 
 /**
  * The simulation which will generate telemetry for the rocket.
@@ -26,8 +26,8 @@ public class Simulation
     private boolean ormIsEnabled = false;
     /** The file name for the ORM export if applicable. Otherwise, empty string. */
     private String fileName = "";
-    /** The scanner to read in the Open rocket model export */
-    private Scanner in;
+    /** The reader to read in the Open rocket model export */
+    private BufferedReader in;
 
     /**
      * Generates an instance of the Simulation class.
@@ -42,7 +42,7 @@ public class Simulation
         this.velocityY = 20;
         this.altitude = 1000;
         this.temperature = 60; // in Fahrenheit
-        this.time = 0;
+        this.time = -1;
     }
 
     public void update()
@@ -57,14 +57,32 @@ public class Simulation
                 Please see the open rocket export file for more info on variable ordering.
              */
 
-            String data[] = in.nextLine().split(",");
+            String line = null;
+            line = readNextLine();
 
-            time = Float.parseFloat(data[0]);
-            altitude = Float.parseFloat(data[1]);
-            velocityY = Float.parseFloat(data[2]);
-            accelerationY = Float.parseFloat(data[3]);
-            velocityX = Float.parseFloat(data[4]);
-            accelerationX = Float.parseFloat(data[5]);
+            // Check for EOF
+            if (line != null)
+            {
+                // Make sure the line isn't a comment.
+                while (line != null && line.substring(0, 1).equals("#"))
+                {
+                    line = readNextLine();
+                }
+
+                // The previous code does NOT account for comments in the csv at EOF
+                // Check for this quickly.
+                if (line != null)
+                {
+                    String[] data = line.split(",");
+
+                    time = Float.parseFloat(data[0]);
+                    altitude = Float.parseFloat(data[1]);
+                    velocityY = Float.parseFloat(data[2]);
+                    accelerationY = Float.parseFloat(data[3]);
+                    velocityX = Float.parseFloat(data[4]);
+                    accelerationX = Float.parseFloat(data[5]);
+                }
+            }
         }
     }
 
@@ -94,6 +112,24 @@ public class Simulation
         this.ormIsEnabled = val;
         this.fileName = fileName;
 
-        in = new Scanner(fileName);
+        try{
+            in = new BufferedReader( new FileReader(fileName) );
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("FileNotFoundException thrown in Simulation while loading the " +
+                    "open rocket export: " + fnfe);
+        }
+    }
+
+    public String readNextLine()
+    {
+        String line = null;
+
+        try {
+            line = in.readLine();
+        } catch (IOException ioe) {
+            System.out.println("IOException thrown while reading line from reader: " + ioe);
+        }
+
+        return line;
     }
 }

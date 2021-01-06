@@ -90,12 +90,14 @@ public class Server extends Thread
      */
     public void printTelemetry()
     {
+        System.out.println("\n----------PACKET RECEIVED----------");
         System.out.println("Horizontal Velocity: " + telemetry[0]);
         System.out.println("Vertical Velocity: " + telemetry[1]);
         System.out.println("Horizontal Acceleration: " + telemetry[2]);
         System.out.println("Vertical Acceleration: " + telemetry[3]);
         System.out.println("Altitude: " + telemetry[4]);
         System.out.println("Temperature: " + telemetry[5] + " F");
+        System.out.println("----------PACKET END----------\n");
     }
 
     /**

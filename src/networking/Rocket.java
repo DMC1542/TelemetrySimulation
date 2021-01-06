@@ -45,8 +45,13 @@ public class Rocket
             byte[] tempData = new byte[Server.PACKET_SIZE];
 
             this.port = port;
-            this.socket = new DatagramSocket(port);
             this.address = InetAddress.getByName(hostName);
+
+            if (hostName.equals("localhost"))
+                this.socket = new DatagramSocket();
+            else
+                this.socket = new DatagramSocket(port);
+
             this.packet = new DatagramPacket(tempData, Server.PACKET_SIZE , address , port);
             
         } catch (SocketException se) {
