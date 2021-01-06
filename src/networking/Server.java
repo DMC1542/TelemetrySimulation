@@ -68,4 +68,9 @@ public class Server extends Thread
         System.out.println("Altitude: " + telemetry[4]);
         System.out.println("Temperature: " + telemetry[5] + " F");
     }
+
+    public void close()
+    {
+        socket.close();
+    }
 }
