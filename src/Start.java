@@ -32,7 +32,6 @@ public class Start
     public static void main(String args[])
     {
         Server server = new Server(Integer.parseInt(args[1]));
-        server.start();
 
         Rocket rocket = new Rocket(args[0], Integer.parseInt(args[1]));
         Simulation sim = new Simulation();
@@ -68,8 +67,15 @@ public class Start
             }
             else
             {
+                try {
+                    Thread.sleep((long)((currentTelemetry[6] - lastTelemetryReadout[6]) * 1000.0));
+                } catch (InterruptedException ie) {
+                    System.out.println("InterruptedException thrown while emulating packet delay: " + ie);
+                }
+
                 rocket.preparePacket(currentTelemetry);
                 rocket.broadcast();
+                server.catchAndParse();
 
                 // Reset lastTelemetryReadout
                 lastTelemetryReadout = currentTelemetry;

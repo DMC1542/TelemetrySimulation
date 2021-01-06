@@ -18,7 +18,7 @@ import java.net.DatagramSocket;
  * Last Modified: 1/5/2021
  */
 
-public class Server extends Thread
+public class Server
 {
     /** The socket which will receive traffic */
     private DatagramSocket socket;
@@ -26,6 +26,10 @@ public class Server extends Thread
     private float[] telemetry = new float[Simulation.NUM_MEASUREMENTS];
     /** Toggles whether to print the telemetry after receiving a packet */
     private boolean displayTelemetry = true;
+    /** A clean byte[] to construct our receiving packet */
+    private byte[] data = new byte[PACKET_SIZE];
+    /** The packet in which incoming traffic will be stored */
+    private DatagramPacket packet = new DatagramPacket(data, PACKET_SIZE);
 
     /** The size, in bytes, of each packet to be received */
     public static final int PACKET_SIZE = Simulation.NUM_MEASUREMENTS * 4;
@@ -47,42 +51,35 @@ public class Server extends Thread
      * The main loop which the server will run. Accepts a packet, parses the information,
      * then updates telemetry for printing.
      */
-    @Override
-    public void run()
+    public void catchAndParse()
     {
-        while (!socket.isClosed())
-        {
-            byte[] data = new byte[PACKET_SIZE];
-            DatagramPacket packet = new DatagramPacket(data, PACKET_SIZE);
-
-            // Wait for packet.
-            try {
-                socket.receive(packet);
-            } catch (IOException ioe) {
-                System.out.println("Server threw IOException while waiting for packet: " + ioe);
-            }
-
-            // Packet received. Let's display the information.
-            data = packet.getData();
-
-            // Convert the byte information into int bits, then into float values.
-            int telemetryIndex = 0;
-            for (int i = 0; i < PACKET_SIZE; i += 4)
-            {
-                int temp = 0;
-                temp += (((int) data[i]) & 0xFF) << 24;
-                temp += (((int) data[i + 1]) & 0xFF) << 16;
-                temp += (((int) data[i + 2]) & 0xFF) << 8;
-                temp += (((int) data[i + 3]) & 0xFF);
-
-                telemetry[telemetryIndex] = Float.intBitsToFloat(temp);
-                telemetryIndex++;
-            }
-
-            // Display telemetry if appropriate
-            if (displayTelemetry)
-                printTelemetry();
+        // Wait for packet.
+        try {
+            socket.receive(packet);
+        } catch (IOException ioe) {
+            System.out.println("Server threw IOException while waiting for packet: " + ioe);
         }
+
+        // Packet received. Let's display the information.
+        data = packet.getData();
+
+        // Convert the byte information into int bits, then into float values.
+        int telemetryIndex = 0;
+        for (int i = 0; i < PACKET_SIZE; i += 4)
+        {
+            int temp = 0;
+            temp += (((int) data[i]) & 0xFF) << 24;
+            temp += (((int) data[i + 1]) & 0xFF) << 16;
+            temp += (((int) data[i + 2]) & 0xFF) << 8;
+            temp += (((int) data[i + 3]) & 0xFF);
+
+            telemetry[telemetryIndex] = Float.intBitsToFloat(temp);
+            telemetryIndex++;
+        }
+
+        // Display telemetry if appropriate
+        if (displayTelemetry)
+            printTelemetry();
     }
 
     /**
@@ -91,6 +88,7 @@ public class Server extends Thread
     public void printTelemetry()
     {
         System.out.println("\n----------PACKET RECEIVED----------");
+        System.out.println("Time: " + telemetry[6]);
         System.out.println("Horizontal Velocity: " + telemetry[0]);
         System.out.println("Vertical Velocity: " + telemetry[1]);
         System.out.println("Horizontal Acceleration: " + telemetry[2]);
