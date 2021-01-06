@@ -80,8 +80,11 @@ public class Rocket
             5 | velocityY
             9 | accelerationX
             13 | accelerationY
-            17 | altitude
+            17 | altitude (m)
             21 | temperature
+            25 | Relevant Time (s)
+            29 | TODO gps value 1 (Longitude?)
+            33 | TODO gps value 2 (Latitude?)
          */
 
         // Prepare temporary array list for appending bytes

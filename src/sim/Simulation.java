@@ -17,9 +17,11 @@ import java.util.Scanner;
 public class Simulation
 {
     /** The number of measurements or telemetry values to be sent */
-    public static final int NUM_MEASUREMENTS = 6;
-    /** Telemetry values. */
-    private float accelerationX, accelerationY, velocityX, velocityY, altitude, temperature;
+    public static final int NUM_MEASUREMENTS = 7;
+    /** Telemetry values */
+    private float accelerationX, accelerationY, velocityX, velocityY, altitude, temperature, time;
+    /** Telemetry values */
+    private float latitude, longitude;
     /** Records if open rocket model flag is toggled or not */
     private boolean ormIsEnabled = false;
     /** The file name for the ORM export if applicable. Otherwise, empty string. */
@@ -40,6 +42,7 @@ public class Simulation
         this.velocityY = 20;
         this.altitude = 1000;
         this.temperature = 60; // in Fahrenheit
+        this.time = 0;
     }
 
     public void update()
@@ -54,7 +57,14 @@ public class Simulation
                 Please see the open rocket export file for more info on variable ordering.
              */
 
+            String data[] = in.nextLine().split(",");
 
+            time = Float.parseFloat(data[0]);
+            altitude = Float.parseFloat(data[1]);
+            velocityY = Float.parseFloat(data[2]);
+            accelerationY = Float.parseFloat(data[3]);
+            velocityX = Float.parseFloat(data[4]);
+            accelerationX = Float.parseFloat(data[5]);
         }
     }
 
@@ -74,6 +84,7 @@ public class Simulation
         data[3] = accelerationY;
         data[4] = altitude;
         data[5] = temperature;
+        data[6] = time;
 
         return data;
     }
