@@ -20,17 +20,13 @@ import java.util.ArrayList;
  * File: Rocket.java
  *
  * Date Created: 1/2/2021
- * Last Modified: 1/5/2021
+ * Last Modified: 1/6/2021
  */
 
 public class Rocket
 {
     /** The socket from which to send data */
     private DatagramSocket socket;
-    /** The address to which to send the packet */
-    private InetAddress address;
-    /** The port to which the packet is destined */
-    private int port;
     /** The packet containing the telemetry */
     private DatagramPacket packet;
 
@@ -44,15 +40,14 @@ public class Rocket
         try{
             byte[] tempData = new byte[Server.PACKET_SIZE];
 
-            this.port = port;
-            this.address = InetAddress.getByName(hostName);
+            InetAddress address = InetAddress.getByName(hostName);
 
             if (hostName.equals("localhost"))
                 this.socket = new DatagramSocket();
             else
                 this.socket = new DatagramSocket(port);
 
-            this.packet = new DatagramPacket(tempData, Server.PACKET_SIZE , address , port);
+            this.packet = new DatagramPacket(tempData, Server.PACKET_SIZE , address, port);
             
         } catch (SocketException se) {
             System.out.println("SocketException thrown by the rocket: " + se);
@@ -110,7 +105,7 @@ public class Rocket
         byte[] finalData = new byte[Server.PACKET_SIZE];
         for (int i = 0; i < byteArrayList.size(); i++)
         {
-            finalData[i] = byteArrayList.get(i).byteValue();
+            finalData[i] = byteArrayList.get(i);
         }
 
         packet.setData(finalData);

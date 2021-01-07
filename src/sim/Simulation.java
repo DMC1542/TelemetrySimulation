@@ -11,7 +11,7 @@ import java.io.*;
  * File: Simulation.java
  *
  * Date Created: 1/2/2021
- * Last Modified: 1/5/2021
+ * Last Modified: 1/6/2021
  */
 
 public class Simulation
@@ -24,8 +24,6 @@ public class Simulation
     private float latitude, longitude;
     /** Records if open rocket model flag is toggled or not */
     private boolean ormIsEnabled = false;
-    /** The file name for the ORM export if applicable. Otherwise, empty string. */
-    private String fileName = "";
     /** The reader to read in the Open rocket model export */
     private BufferedReader in;
 
@@ -45,6 +43,9 @@ public class Simulation
         this.time = -1;
     }
 
+    /**
+     * Advances the simulation by one 'tick'. Updates the telemetry values accordingly.
+     */
     public void update()
     {
         // Follow the ORM if enabled
@@ -57,14 +58,14 @@ public class Simulation
                 Please see the open rocket export file for more info on variable ordering.
              */
 
-            String line = null;
+            String line;
             line = readNextLine();
 
             // Check for EOF
             if (line != null)
             {
                 // Make sure the line isn't a comment.
-                while (line != null && line.substring(0, 1).equals("#"))
+                while (line != null && line.charAt(0) == '#')
                 {
                     line = readNextLine();
                 }
@@ -107,19 +108,30 @@ public class Simulation
         return data;
     }
 
+    /**
+     * Sets the ORM flag to be true and sets up the necessary reader to read Open rocket export.
+     * @param val A boolean which determines whether ORM mode is enabled or disabled.
+     * @param fileName The name of the Open Rocket csv to load.
+     */
     public void enableOrmMode(boolean val, String fileName)
     {
         this.ormIsEnabled = val;
-        this.fileName = fileName;
 
-        try{
-            in = new BufferedReader( new FileReader(fileName) );
-        } catch (FileNotFoundException fnfe) {
-            System.out.println("FileNotFoundException thrown in Simulation while loading the " +
-                    "open rocket export: " + fnfe);
+        if (ormIsEnabled)
+        {
+            try{
+                in = new BufferedReader( new FileReader(fileName) );
+            } catch (FileNotFoundException fnfe) {
+                System.out.println("FileNotFoundException thrown in Simulation while loading the " +
+                        "open rocket export: " + fnfe);
+            }
         }
     }
 
+    /**
+     * Simply reads in the next line from the reader and returns it.
+     * @return The next line of the file which is opened by the reader.
+     */
     public String readNextLine()
     {
         String line = null;

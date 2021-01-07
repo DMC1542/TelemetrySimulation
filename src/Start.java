@@ -16,7 +16,7 @@ import sim.Simulation;
  * File: Start.java
  *
  * Date Created: 1/2/2021
- * Last Modified: 1/5/2021
+ * Last Modified: 1/6/2021
  */
 
 public class Start
@@ -29,7 +29,7 @@ public class Start
      * @param args The user-provided arguments containing host name and port, optionally:
      *             -orm : Open Rocket Model
      */
-    public static void main(String args[])
+    public static void main(String[] args)
     {
         Server server = new Server(Integer.parseInt(args[1]));
 
