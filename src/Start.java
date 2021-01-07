@@ -21,10 +21,13 @@ import sim.Simulation;
 
 public class Start
 {
+    /** Flag for running the sim in real time */
+    private static boolean inRealTime = false;
+
     /**
      * The main method. Serves as the entry point.
      *
-     * Usage: java Start hostName port -orm
+     * Usage: java Start hostName port [-orm exportName] [-rt]
      *
      * @param args The user-provided arguments containing host name and port, optionally:
      *             -orm : Open Rocket Model
@@ -45,6 +48,10 @@ public class Start
                 {
                     sim.enableOrmMode(true, args[i + 1]);
                     i++;
+                }
+                else if (args[i].equals("-rt"))
+                {
+                    inRealTime = true;
                 }
             }
         }
@@ -67,10 +74,13 @@ public class Start
             }
             else
             {
-                try {
-                    Thread.sleep((long)((currentTelemetry[6] - lastTelemetryReadout[6]) * 1000.0));
-                } catch (InterruptedException ie) {
-                    System.out.println("InterruptedException thrown while emulating packet delay: " + ie);
+                if (inRealTime)
+                {
+                    try {
+                        Thread.sleep((long)((currentTelemetry[6] - lastTelemetryReadout[6]) * 1000.0));
+                    } catch (InterruptedException ie) {
+                        System.out.println("InterruptedException thrown while emulating packet delay: " + ie);
+                    }
                 }
 
                 rocket.preparePacket(currentTelemetry);
