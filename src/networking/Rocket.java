@@ -72,42 +72,8 @@ public class Rocket
      * Prepares the packet from the telemetry given as a parameter.
      * @param simData The telemetry information from the simulation.
      */
-    public void preparePacket(float[] simData)
+    public void updatePacket(byte[] simData)
     {
-        /*
-            Structure: (Starting Byte | Data)
-            0 | velocityX
-            5 | velocityY
-            9 | accelerationX
-            13 | accelerationY
-            17 | altitude (m)
-            21 | temperature
-            25 | Relevant Time (s)
-            29 | TODO gps value 1 (Longitude?)
-            33 | TODO gps value 2 (Latitude?)
-         */
-
-        // Prepare temporary array list for appending bytes
-        ArrayList<Byte> byteArrayList = new ArrayList<>();
-
-        // Add values to the array list
-        for (int i = 0; i < simData.length; i++)
-        {
-            byte[] temp = ByteBuffer.allocate(4).putFloat(simData[i]).array();
-
-            for (int j = 0; j < temp.length; j++)
-            {
-                byteArrayList.add(temp[j]);
-            }
-        }
-
-        // Get a byte[] from ArrayList<Byte>
-        byte[] finalData = new byte[Server.PACKET_SIZE];
-        for (int i = 0; i < byteArrayList.size(); i++)
-        {
-            finalData[i] = byteArrayList.get(i);
-        }
-
-        packet.setData(finalData);
+        packet.setData(simData);
     }
 }

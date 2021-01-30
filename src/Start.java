@@ -57,17 +57,17 @@ public class Start
         }
 
         // Main loop
-        float[] lastTelemetryReadout = sim.getTelemetry();
+        byte[] lastTelemetryReadout = sim.getTelemetryAsBArray();
 
         while (true)
         {
             // Update that simulation.
             sim.update();
-            float[] currentTelemetry = sim.getTelemetry();
+            byte[] currentTelemetry = sim.getTelemetryAsBArray();
 
             /* Check to see if we reached the end of the simulation. The times should be
             exactly the same. If they are, break out of the loop.*/
-            if (lastTelemetryReadout[6] == currentTelemetry[6])
+            // INCORRECT if (lastTelemetryReadout[6] == currentTelemetry[6])
             {
                 server.close();
                 break;
@@ -83,7 +83,7 @@ public class Start
                     }
                 }
 
-                rocket.preparePacket(currentTelemetry);
+                rocket.updatePacket(currentTelemetry);
                 rocket.broadcast();
                 server.catchAndParse();
 

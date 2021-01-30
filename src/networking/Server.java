@@ -4,6 +4,7 @@ import sim.Simulation;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.nio.ByteBuffer;
 
 /**
  * This class represents the Ground Station itself.
@@ -23,7 +24,9 @@ public class Server
     /** The socket which will receive traffic */
     private DatagramSocket socket;
     /** The telemetry data from the simulation */
-    private float[] telemetry = new float[Simulation.NUM_MEASUREMENTS];
+    private short[] sTelemetry = new short[Simulation.NUM_MEASUREMENTS];
+    /** The telemetry data from the simulation */
+    private float[] fTelemetry = new float[3];
     /** Toggles whether to print the telemetry after receiving a packet */
     private boolean displayTelemetry = true;
     /** A clean byte[] to construct our receiving packet */
@@ -63,19 +66,43 @@ public class Server
         // Packet received. Let's display the information.
         data = packet.getData();
 
-        // Convert the byte information into int bits, then into float values.
+        // Parse info.
+        ByteBuffer buffer = ByteBuffer.wrap(data);
         int telemetryIndex = 0;
-        for (int i = 0; i < PACKET_SIZE; i += 4)
-        {
-            int temp = 0;
-            temp += (((int) data[i]) & 0xFF) << 24;
-            temp += (((int) data[i + 1]) & 0xFF) << 16;
-            temp += (((int) data[i + 2]) & 0xFF) << 8;
-            temp += (((int) data[i + 3]) & 0xFF);
 
-            telemetry[telemetryIndex] = Float.intBitsToFloat(temp);
+        for (int i = 8; i < 25; i += 2)
+        {
+            sTelemetry[telemetryIndex] = buffer.getShort(i);
             telemetryIndex++;
         }
+
+        buffer.getFloat(26);
+        buffer.getFloat(31);
+        buffer.getFloat(36);
+
+        // buffer.get(boolToByte(gpsFix));
+
+        //GPS_NUM_SATS 1
+        //GPS_TIME_H 1
+        //GPS_TIME_M 1
+        //GPS_TIME_S 1
+        //GPS_TIME_MS 2 # milliseconds is 2 bytes
+
+        sTelemetry[telemetryIndex++] = buffer.getShort(41); //TODO temp
+
+        /*
+        buffer.put(boolToByte(chargeCont1));
+        buffer.put(boolToByte(chargeCont2));
+        buffer.put(boolToByte(chargeCont3));
+        buffer.put(boolToByte(chargeCont4));
+
+        buffer.put(boolToByte(chargeDeploy1));
+        buffer.put(boolToByte(chargeDeploy2));
+        buffer.put(boolToByte(chargeDeploy3));
+        buffer.put(boolToByte(chargeDeploy4));
+        */
+
+        //buffer.putShort(temperature);
 
         // Display telemetry if appropriate
         if (displayTelemetry)
@@ -88,12 +115,18 @@ public class Server
     public void printTelemetry()
     {
         System.out.println("\n----------PACKET RECEIVED----------");
-        System.out.println("Time: " + telemetry[6]);
+        System.out.println("Uptime: " + telemetry[6]);
         System.out.println("Horizontal Velocity: " + telemetry[0]);
         System.out.println("Vertical Velocity: " + telemetry[1]);
-        System.out.println("Horizontal Acceleration: " + telemetry[2]);
-        System.out.println("Vertical Acceleration: " + telemetry[3]);
-        System.out.println("Altitude: " + telemetry[4]);
+        System.out.println("Acceleration X: " + telemetry[2]);
+        System.out.println("Acceleration Y: " + telemetry[3]);
+        System.out.println("Acceleration Z: " + telemetry[3]);
+        System.out.println("Acceleration High G: " + telemetry[3] + "\n");
+        System.out.println("Roll: " + telemetry[4]);
+        System.out.println("Pitch: " + telemetry[4]);
+        System.out.println("Yaw: " + telemetry[4]);
+        System.out.println("Altitude 1: " + telemetry[4]);
+        System.out.println("Altitude 2: " + telemetry[4]);
         System.out.println("Temperature: " + telemetry[5] + " F");
         System.out.println("----------PACKET END----------\n");
     }

@@ -1,6 +1,7 @@
 package sim;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 
 /**
  * The simulation which will generate telemetry for the rocket.
@@ -19,9 +20,16 @@ public class Simulation
     /** The number of measurements or telemetry values to be sent */
     public static final int NUM_MEASUREMENTS = 7;
     /** Telemetry values */
-    private float accelerationX, accelerationY, velocityX, velocityY, altitude, temperature, time;
+    private short accelerationX, accelerationY, accelerationZ, accelHighG,
+            roll, pitch, yaw,
+            velocityX, velocityY, altitude1, altitude2, temperature, time,
+            latitude, longitude,
+            uptime;
     /** Telemetry values */
-    private float latitude, longitude;
+    private float gpsLat, gpsLong, gpsAlt;
+    /** Telemetry values */
+    private boolean gpsFix, chargeCont1, chargeCont2, chargeCont3, chargeCont4,
+            chargeDeploy1, chargeDeploy2, chargeDeploy3, chargeDeploy4;
     /** Records if open rocket model flag is toggled or not */
     private boolean ormIsEnabled = false;
     /** The reader to read in the Open rocket model export */
@@ -38,7 +46,8 @@ public class Simulation
         this.accelerationY = 11;
         this.velocityX = 15;
         this.velocityY = 20;
-        this.altitude = 1000;
+        this.altitude1 = 1000;
+        this.altitude2 = 1000;
         this.temperature = 60; // in Fahrenheit
         this.time = -1;
     }
@@ -76,36 +85,64 @@ public class Simulation
                 {
                     String[] data = line.split(",");
 
-                    time = Float.parseFloat(data[0]);
-                    altitude = Float.parseFloat(data[1]);
-                    velocityY = Float.parseFloat(data[2]);
-                    accelerationY = Float.parseFloat(data[3]);
-                    velocityX = Float.parseFloat(data[4]);
-                    accelerationX = Float.parseFloat(data[5]);
+                    time = Short.parseShort(data[0]);
+                    altitude1 = Short.parseShort(data[1]);
+                    velocityY = Short.parseShort(data[2]);
+                    accelerationY = Short.parseShort(data[3]);
+                    velocityX = Short.parseShort(data[4]);
+                    accelerationX = Short.parseShort(data[5]);
                 }
             }
         }
     }
 
     /**
-     * Returns the current telemetry values as an array of floats
-     * @return A float array of all current numeric measurements
+     * Returns the current telemetry values, in order, as a byte array
+     * @return A byte array of all current numeric measurements
      */
-    public float[] getTelemetry()
+    public byte[] getTelemetryAsBArray()
     {
-        float[] data = new float[NUM_MEASUREMENTS];
-
         // Predetermined order for packet building.
         // Please see documentation for specific ordering.
-        data[0] = velocityX;
-        data[1] = velocityY;
-        data[2] = accelerationX;
-        data[3] = accelerationY;
-        data[4] = altitude;
-        data[5] = temperature;
-        data[6] = time;
 
-        return data;
+        ByteBuffer buffer = ByteBuffer.allocate(59);
+        buffer.putShort(accelerationX);
+        buffer.putShort(accelerationY);
+        buffer.putShort(accelerationZ);
+        buffer.putShort(accelHighG);
+        buffer.putShort(pitch);
+        buffer.putShort(roll);
+        buffer.putShort(yaw);
+        buffer.putShort(altitude1);
+        buffer.putShort(altitude2);
+
+        buffer.putFloat(gpsLat);
+        buffer.putFloat(gpsLong);
+        buffer.putFloat(gpsAlt);
+
+        buffer.put(boolToByte(gpsFix));
+
+        //GPS_NUM_SATS 1
+        //GPS_TIME_H 1
+        //GPS_TIME_M 1
+        //GPS_TIME_S 1
+        //GPS_TIME_MS 2 # milliseconds is 2 bytes
+
+        buffer.putShort(uptime);
+
+        buffer.put(boolToByte(chargeCont1));
+        buffer.put(boolToByte(chargeCont2));
+        buffer.put(boolToByte(chargeCont3));
+        buffer.put(boolToByte(chargeCont4));
+
+        buffer.put(boolToByte(chargeDeploy1));
+        buffer.put(boolToByte(chargeDeploy2));
+        buffer.put(boolToByte(chargeDeploy3));
+        buffer.put(boolToByte(chargeDeploy4));
+
+        buffer.putShort(temperature);
+
+        return buffer.array();
     }
 
     /**
@@ -143,5 +180,13 @@ public class Simulation
         }
 
         return line;
+    }
+
+    private byte boolToByte(boolean bool)
+    {
+        if (bool)
+            return (byte)1;
+        else
+            return (byte)0;
     }
 }
