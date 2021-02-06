@@ -23,19 +23,24 @@ public class Start
 {
     /** Flag for running the sim in real time */
     private static boolean inRealTime = false;
+    /** Flag for running in debug mode */
+    private static boolean debugMode = false;
+    /** The receiving server */
+    private static Server server;
 
     /**
      * The main method. Serves as the entry point.
      *
-     * Usage: java Start hostName port [-orm exportName] [-rt]
+     * Usage: java Start hostName port [-orm exportName] [-rt] [-d]
      *
      * @param args The user-provided arguments containing host name and port, optionally:
      *             -orm : Open Rocket Model
+     *             -rt : Real Time sim
+     *             -d : Debug mode, which runs the receiving server.
      */
     public static void main(String[] args)
     {
-        Server server = new Server(Integer.parseInt(args[1]));
-
+        // Start rocket and the simulation
         Rocket rocket = new Rocket(args[0], Integer.parseInt(args[1]));
         Simulation sim = new Simulation();
 
@@ -53,8 +58,16 @@ public class Start
                 {
                     inRealTime = true;
                 }
+                else if (args[i].equals("-d"))
+                {
+                    debugMode = true;
+                }
             }
         }
+
+        // If in debug mode, start the server
+        if (debugMode)
+            server = new Server(Integer.parseInt(args[1]));
 
         // Main loop
         float[] lastTelemetryReadout = sim.getTelemetry();
@@ -69,7 +82,8 @@ public class Start
             exactly the same. If they are, break out of the loop.*/
             if (lastTelemetryReadout[6] == currentTelemetry[6])
             {
-                server.close();
+                if (debugMode)
+                    server.close();
                 break;
             }
             else
@@ -85,7 +99,9 @@ public class Start
 
                 rocket.preparePacket(currentTelemetry);
                 rocket.broadcast();
-                server.catchAndParse();
+
+                if (debugMode)
+                    server.catchAndParse();
 
                 // Reset lastTelemetryReadout
                 lastTelemetryReadout = currentTelemetry;
