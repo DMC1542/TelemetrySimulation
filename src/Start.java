@@ -67,7 +67,7 @@ public class Start
 
             /* Check to see if we reached the end of the simulation. The times should be
             exactly the same. If they are, break out of the loop.*/
-            // INCORRECT if (lastTelemetryReadout[6] == currentTelemetry[6])
+            if (lastTelemetryReadout[6] == currentTelemetry[6]) // INCORRECT
             {
                 server.close();
                 break;

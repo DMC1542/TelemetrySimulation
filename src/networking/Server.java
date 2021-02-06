@@ -114,6 +114,7 @@ public class Server
      */
     public void printTelemetry()
     {
+        /*
         System.out.println("\n----------PACKET RECEIVED----------");
         System.out.println("Uptime: " + telemetry[6]);
         System.out.println("Horizontal Velocity: " + telemetry[0]);
@@ -129,6 +130,7 @@ public class Server
         System.out.println("Altitude 2: " + telemetry[4]);
         System.out.println("Temperature: " + telemetry[5] + " F");
         System.out.println("----------PACKET END----------\n");
+         */
     }
 
     /**
